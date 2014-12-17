@@ -1,0 +1,2 @@
+(ns hammock.core)
+
