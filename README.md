@@ -12,7 +12,7 @@ transformation, by performing the transformation with objects we are calling
 "hammocks."
 
 Hammocks are a bit like [Om cursors], except they are anchored to two separate
-trees: a read-only "source" tree and read-write "destination" tree. The
+trees: a read-only "source" tree and write-only "destination" tree. The
 following functions are created to perform and remember simple transformations:
 
 ```clj
@@ -28,9 +28,15 @@ following functions are created to perform and remember simple transformations:
 ;; Nested operations will not be remembered though)
 (hm/map! h :dest-key :src-key hammock-fn)
 
-;; Manually set dest the given value. Optionally include a set of src-keys used
-;; to compute the value.
+;; Manually set dest to the given value. Optionally include a set of src-keys used
+;; to compute the value. This is intended to be used when a dest value depends on
+;; multiple src values or vice versa.
 (hm/man! h :dest-key value src-keys?)
+
+;; Lookup operations are performed on the read-only "source" tree.  It is intended
+;; to assist in computing intermediate values that may be shared across multiple
+;; `man!` commands.
+(:src-key h)
 
 ;; NOTE: a "key" can be a keyword or a vector of keywords.
 ;; it can also be [] to denote current path (TODO: must find allowed cases)
@@ -79,8 +85,10 @@ paths, representing the operations that took place during the transformation.
 
 ;; ============================================
 
-;; nest example
-;; nest-map example
+;; nest! example
+;; map! example
+;; man! example
+;; ILookup example
 ```
 
 
