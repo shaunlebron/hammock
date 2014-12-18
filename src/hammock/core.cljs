@@ -1,6 +1,8 @@
 (ns hammock.core)
 
 (defprotocol IHammock
+  (-dest [this])
+  (-anchors [this])
   (-copy! [this dst-key src-key d-fn])
   (-nest! [this dst-key src-key h-fn])
   (-map!  [this dst-key src-key h-fn])
@@ -14,12 +16,22 @@
   [path k]
   (vec (concat path (norm-path k))))
 
+(defn- remember-anchor!
+  [key-path val-path anchors dir]
+  (if (get-in @anchors [dir key-path])
+    (swap! anchors update-in [dir key-path] conj val-path)
+    (swap! anchors assoc-in [dir key-path] (hash-set val-path))))
+
 (defn- remember-anchors!
   [src-path dst-path anchors]
-  nil)
+  (remember-anchor! src-path dst-path anchors :forward)
+  (remember-anchor! dst-path src-path anchors :inverse))
 
 (deftype Hammock [src src-path dst dst-path anchors]
   IHammock
+  (-dest    [this] @dst)
+  (-anchors [this] @anchors)
+
   (-copy! [this dst-key src-key d-fn]
     (let [src-path (join-path src-path src-key)
           dst-path (join-path dst-path dst-key)
@@ -85,3 +97,11 @@
    (man! h dst-key value nil))
   ([h dst-key value src-keys]
    (-man! h dst-key value src-keys)))
+
+(defn dest
+  [h]
+  (-dest h))
+
+(defn anchors
+  [h]
+  (-anchors h))
