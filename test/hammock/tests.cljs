@@ -31,6 +31,20 @@
       (hm/nest! h :boo [] (fn [h] (hm/copy! h :far :booFar)))
       (is (= "hi" (-> @dst :foo :bar)))
       (is (= "bye" (-> @dst :boo :far)))))
+  (testing "Testing map!"
+    (let [src {:foo [{:a 1 :b 2}
+                     {:a 3 :b 4}
+                     {:a 5 :b 6}]}
+          dst (atom {})
+          expected-dst {:foo {:things [{:a 1 :c 3}
+                                       {:a 3 :c 7}
+                                       {:a 5 :c 11}]}}
+          h (hm/create src dst)
+          mapping (fn [h]
+                    (hm/copy! h :a :a)
+                    (hm/man! h :c (+ (:a h) (:b h)) [:a :b]))]
+      (hm/map! h [:foo :things] :foo mapping)
+      (is (= @dst expected-dst))))
   (testing "Testing man!"
     (let [src {:fooBar "hi" :booFar "bye"}
           dst (atom {})

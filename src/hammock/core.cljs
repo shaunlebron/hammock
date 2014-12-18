@@ -33,6 +33,17 @@
           new-h (Hammock. src src-path dst dst-path anchors)]
       (h-fn new-h)))
 
+  (-map! [this dst-key src-key h-fn]
+    (let [src-path (join-path src-path src-key)
+          dst-path (join-path dst-path dst-key)
+          src-val (get-in src src-path)]
+      (swap! dst assoc-in dst-path [])
+      (dotimes [i (count src-val)]
+        (let [src-path (join-path src-path i)
+              dst-path (join-path dst-path i)
+              new-h (Hammock. src src-path dst dst-path anchors)]
+          (h-fn new-h)))))
+
   (-man! [this dst-key value src-keys]
     (let [dst-path (join-path dst-path dst-key)]
       (swap! dst assoc-in dst-path value)
@@ -63,7 +74,9 @@
   [h dst-key src-key h-fn]
   (-nest! h dst-key src-key h-fn))
 
-;; (map! h :dest-key :src-key h-fn)
+(defn map!
+  [h dst-key src-key h-fn]
+  (-map! h dst-key src-key h-fn))
 
 (defn man!
   ([h dst-key value]
