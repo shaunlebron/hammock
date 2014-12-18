@@ -5,6 +5,8 @@ another and to remember related branches.
 
 [![Clojars Project](http://clojars.org/hammock/latest-version.svg)](http://clojars.org/hammock)
 
+## Rationale
+
 In UIs, it is common to transform JSON data received from a backend REST
 service into data better suited for representation on screen.  After this
 transformation is made, it is useful to remember which original fields are
@@ -18,7 +20,14 @@ Hammocks are a bit like [Om cursors], except they are anchored to two separate
 trees: a read-only "source" tree and write-only "destination" tree. The
 following functions are created to perform and remember simple transformations:
 
-## Creating
+## Usage
+
+Add `[hammock "0.1.1"]` to your dependencies vector in project.clj.
+
+```clj
+(ns example
+ (:require [hammock.core :as hm]))
+```
 
 You create a hammock by giving the constructor function an existing tree of
 data to be transformed.
@@ -27,8 +36,6 @@ data to be transformed.
 ;; Create a hammock starting with some tree to be transformed.
 (def h (hm/create some-tree))
 ```
-
-## Building Transformed Tree
 
 With this hammock, you can start building a new tree using hammock operations
 acting on the original tree.  All operations are tracked so you can relate the
@@ -61,8 +68,6 @@ nodes in both trees.
 (:src-key h)
 ```
 
-## Reading Results
-
 After you are done building the new tree, you can read it out of the hammock object.
 You can also read out the "anchor" maps that map any given branch to the related
 branches in the other tree.
@@ -75,15 +80,6 @@ branches in the other tree.
 (let [anchors (hm/anchors h)]
   (:forward anchors)  ;; => maps old-path to related new-paths
   (:inverse anchors)) ;; => maps new-path to related old-paths
-```
-
-## Usage
-
-Add `[hammock "0.1.1"]` to your dependencies vector in project.clj.
-
-```clj
-(ns example
- (:require [hammock.core :as hm]))
 ```
 
 ## Running tests
