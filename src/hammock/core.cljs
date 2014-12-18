@@ -10,9 +10,9 @@
   [k]
   (if (sequential? k) k [k]))
 
-(defn- create-missing-levels!
-  [dst dst-path]
-  nil)
+(defn- join-path
+  [path k]
+  (concat path (normalize-key k)))
 
 (defn- remember-anchors!
   [src-path dst-path anchors]
@@ -21,30 +21,23 @@
 (deftype Hammock [src src-path dst dst-path anchors]
   IHammock
   (-copy! [this dst-key src-key d-fn]
-    (let [dst-key (normalize-key dst-key)
-          src-key (normalize-key src-key)
-          src-path (concat src-path src-key)
-          src-val (d-fn (get-in src src-path))
-          dst-path (concat dst-path dst-key)]
-      (create-missing-levels! dst dst-path)
+    (let [src-path (join-path src-path src-key)
+          dst-path (join-path dst-path dst-key)
+          src-val (d-fn (get-in src src-path))]
       (swap! dst assoc-in dst-path src-val)
       (remember-anchors! src-path dst-path anchors)))
 
   (-nest! [this dst-key src-key h-fn]
-    (let [dst-key (normalize-key dst-key)
-          src-key (normalize-key src-key)
-          src-path (concat src-path src-key)
-          dst-path (concat dst-path dst-key)
+    (let [src-path (join-path src-path src-key)
+          dst-path (join-path dst-path dst-key)
           new-h (Hammock. src src-path dst dst-path anchors)]
       (h-fn new-h)))
 
   (-man! [this dst-key value src-keys]
-    (let [dst-key (normalize-key dst-key)
-          dst-path (concat dst-path dst-key)]
+    (let [dst-path (join-path dst-path dst-key)]
       (swap! dst assoc-in dst-path value)
       (doseq [k src-keys]
-        (let [src-key (normalize-key k)
-              src-path (concat src-path src-key)]
+        (let [src-path (join-path src-path k)]
           (remember-anchors! src-path dst-path anchors)))))
 
   ILookup
