@@ -17,8 +17,17 @@ transformation, by performing the transformation with objects we are calling
 "hammocks."
 
 Hammocks are a bit like [Om cursors], except they are anchored to two separate
-trees: a read-only "source" tree and write-only "destination" tree. The
-following functions are created to perform and remember simple transformations:
+trees: a read-only "source" tree and write-only "destination" tree. These
+anchor points on the hammock move along their respective trees as data is
+transformed from source to destination.  A log of the anchor positions is
+kept for each transformation in order to remember the relationship between
+source and destination branches.
+
+We cannot simply perform these transformations with usual data operations and
+pure functions, since they preclude the possibility of knowing where data is
+being read from and written to.  Instead, we must use functions/operations that
+deal with hammocks, which can still be made as composable as pure functions
+are.
 
 ## Usage
 
