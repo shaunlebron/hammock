@@ -1,4 +1,4 @@
-(defproject hammock "0.1.0"
+(defproject hammock "0.1.1"
   :description "tie two trees together to track a transformation"
   :url "https://github.com/shaunlebron/hammock"
 

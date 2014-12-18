@@ -28,7 +28,7 @@ data to be transformed.
 (def h (hm/create some-tree))
 ```
 
-## Tree Builder Operations
+## Building Transformed Tree
 
 With this hammock, you can start building a new tree using hammock operations
 acting on the original tree.  All operations are tracked so you can relate the
@@ -76,6 +76,26 @@ branches in the other tree.
   (:forward anchors)  ;; => maps old-path to related new-paths
   (:inverse anchors)) ;; => maps new-path to related old-paths
 ```
+
+## Usage
+
+Add `[hammock "0.1.1"]` to your dependencies vector in project.clj.
+
+```clj
+(ns example
+ (:require [hammock.core :as hm]))
+```
+
+## Running tests
+
+1. Build the tests.
+
+    ```
+    lein cljsbuild auto
+    ```
+
+1. Open "script/run_tests.html" in a browser.
+1. See test results in javascript console.
 
 ## License
 
