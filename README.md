@@ -1,4 +1,4 @@
-# Hammock
+# hammock
 
 (experimental work in progress)
 
@@ -72,7 +72,13 @@ branches in the other tree.
 (let [anchors (hm/anchors h)]
   (:forward anchors)  ;; => maps old-path to related new-paths
   (:inverse anchors)) ;; => maps new-path to related old-paths
-
 ```
+
+## License
+
+Copyright © 2014 Shaun Williams
+
+Distributed under the Eclipse Public License either version 1.0 or any
+later version.
 
 [Om cursors]: https://github.com/swannodette/om/wiki/Cursors
