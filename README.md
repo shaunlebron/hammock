@@ -17,14 +17,14 @@ following functions are created to perform and remember simple transformations:
 
 ```clj
 ;; Set dest value to src value. Applying function to the src value if given.
-(hm/set! h :dest-key :src-key data-fn?)
+(hm/copy! h :dest-key :src-key data-fn?)
 
 ;; Start a nested transaction by moving the hammock to the given relative keys,
 ;; and passing it to the given function.
 (hm/nest! h :dest-key :src-key hammock-fn)
 
 ;; Map the src seq to the dest seq with the given hammock function.  (If you wish
-;; to use a function that doesn't take a hammock, use set! with a mapv function.
+;; to use a function that doesn't take a hammock, use copy! with a mapv function.
 ;; Nested operations will not be remembered though)
 (hm/map! h :dest-key :src-key hammock-fn)
 
@@ -63,7 +63,7 @@ paths, representing the operations that took place during the transformation.
 
 ;; ============================================
 
-(hm/set! h [:foo :bar] [:foo-bar])
+(hm/copy! h [:foo :bar] [:foo-bar])
 
 @new-tree
 ;; => {:foo {:bar "hello"}}
@@ -73,7 +73,7 @@ paths, representing the operations that took place during the transformation.
 
 ;; ============================================
 
-(hm/set! h [:foo :baz] [:foo-baz])
+(hm/copy! h [:foo :baz] [:foo-baz])
 
 @new-tree
 ;; => {:foo {:bar "hello"
