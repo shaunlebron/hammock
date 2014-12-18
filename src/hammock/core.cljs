@@ -44,7 +44,7 @@
   (-lookup [this k]
     (-lookup this k nil))
   (-lookup [this k not-found]
-    (-lookup src k not-found)))
+    (-lookup (get-in src src-path) k not-found)))
 
 (defn create
   ([src]             (create src (atom {})))

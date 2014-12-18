@@ -4,11 +4,17 @@
     [cljs.test :refer-macros [deftest is testing run-tests]]))
 
 (deftest test-basic
-  (testing "Testing lookup on destination anchor."
+  (testing "Testing lookup"
     (let [src {:foo "bar" :bar ["hi" "there"]}
           h (hm/create src)]
       (is (= "bar" (:foo h)))
       (is (= "there" (get-in h [:bar 1])))))
+  (testing "Testing nested lookup."
+    (let [src {:foo {:bar "hi"}}
+          dst (atom {})
+          anchors (atom {})
+          h (hm/create src [:foo] dst [] anchors)]
+      (is (= "hi" (:bar h)))))
   (testing "Testing copy!"
     (let [src {:fooBar "hi" :booFar "bye"}
           dst (atom {})
