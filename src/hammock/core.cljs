@@ -6,13 +6,13 @@
   (-map!  [this dst-key src-key h-fn])
   (-man!  [this dst-ks value src-keys]))
 
-(defn- normalize-key
+(defn- norm-path
   [k]
-  (if (sequential? k) k [k]))
+  (if (sequential? k) (vec k) [k]))
 
 (defn- join-path
   [path k]
-  (concat path (normalize-key k)))
+  (vec (concat path (norm-path k))))
 
 (defn- remember-anchors!
   [src-path dst-path anchors]
@@ -62,7 +62,9 @@
   ([src dst]         (create src dst (atom {})))
   ([src dst anchors] (create src [] dst [] anchors))
   ([src src-path dst dst-path anchors]
-   (Hammock. src src-path dst dst-path anchors)))
+   (let [src-path (norm-path src-path)
+         dst-path (norm-path dst-path)]
+     (Hammock. src src-path dst dst-path anchors))))
 
 (defn copy!
   ([h dst-key src-key]

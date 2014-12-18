@@ -13,8 +13,10 @@
     (let [src {:foo {:bar "hi"}}
           dst (atom {})
           anchors (atom {})
-          h (hm/create src [:foo] dst [] anchors)]
-      (is (= "hi" (:bar h)))))
+          h (hm/create src [:foo] dst [] anchors)
+          h2 (hm/create src :foo dst [] anchors)]
+      (is (= "hi" (:bar h)))
+      (is (= "hi" (:bar h2)))))
   (testing "Testing copy!"
     (let [src {:fooBar "hi" :booFar "bye"}
           dst (atom {})
