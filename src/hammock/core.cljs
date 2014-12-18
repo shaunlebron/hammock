@@ -30,7 +30,7 @@
 
 (deftype Hammock [src src-path dst dst-path anchors]
   IHammock
-  (-old-tree [this] @src)
+  (-old-tree [this] src)
   (-new-tree [this] @dst)
   (-anchors [this] @anchors)
 

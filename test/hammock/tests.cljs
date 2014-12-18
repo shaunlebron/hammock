@@ -4,6 +4,13 @@
     [cljs.test :refer-macros [deftest is testing run-tests]]))
 
 (deftest test-basic
+  (testing "Testing read-out operations."
+    (let [src {:foo "bar" :bar ["hi" "there"]}
+          dst (atom {:hello "world"})
+          h (hm/create src dst)]
+      (is (= src (hm/old-tree h)))
+      (is (= @dst (hm/new-tree h)))
+      (is (= {} (hm/anchors h)))))
   (testing "Testing lookup"
     (let [src {:foo "bar" :bar ["hi" "there"]}
           h (hm/create src)]
@@ -88,8 +95,7 @@
       (hm/man! h [:boo :far] byehi [:booFar :fooBar])
       (is (= "hibye" (-> @dst :foo :bar)))
       (is (= "byehi" (-> @dst :boo :far)))
-      (is (= @anchors expected-anchors))))
-  )
+      (is (= @anchors expected-anchors)))))
 
 (enable-console-print!)
 
