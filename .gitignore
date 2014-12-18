@@ -2,9 +2,11 @@ pom.xml
 *jar
 /lib/
 /classes/
-/out/
+/script/out/
 /target/
 *.js
+*.js.map
 .lein-deps-sum
 .lein-repl-history
 .lein-plugins/
+*.swp
