@@ -25,6 +25,16 @@
       (hm/nest! h :boo [] (fn [h] (hm/copy! h :far :booFar)))
       (is (= "hi" (-> @dst :foo :bar)))
       (is (= "bye" (-> @dst :boo :far)))))
+  (testing "Testing man!"
+    (let [src {:fooBar "hi" :booFar "bye"}
+          dst (atom {})
+          h (hm/create src dst)
+          hibye (str (:fooBar h) (:booFar h))
+          byehi (str (:booFar h) (:fooBar h))]
+      (hm/man! h [:foo :bar] hibye [:fooBar :booFar])
+      (hm/man! h [:boo :far] byehi [:booFar :fooBar])
+      (is (= "hibye" (-> @dst :foo :bar)))
+      (is (= "byehi" (-> @dst :boo :far)))))
   )
 
 (enable-console-print!)

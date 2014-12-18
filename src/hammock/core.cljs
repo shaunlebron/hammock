@@ -38,6 +38,15 @@
           new-h (Hammock. src src-path dst dst-path anchors)]
       (h-fn new-h)))
 
+  (-man! [this dst-key value src-keys]
+    (let [dst-key (normalize-key dst-key)
+          dst-path (concat dst-path dst-key)]
+      (swap! dst assoc-in dst-path value)
+      (doseq [k src-keys]
+        (let [src-key (normalize-key k)
+              src-path (concat src-path src-key)]
+          (remember-anchors! src-path dst-path anchors)))))
+
   ILookup
   (-lookup [this k]
     (-lookup this k nil))
@@ -62,4 +71,9 @@
   (-nest! h dst-key src-key h-fn))
 
 ;; (map! h :dest-key :src-key h-fn)
-;; (man! h :dest-key fn :src-keys)
+
+(defn man!
+  ([h dst-key value]
+   (man! h dst-key value nil))
+  ([h dst-key value src-keys]
+   (-man! h dst-key value src-keys)))
