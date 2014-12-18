@@ -16,7 +16,16 @@
       (hm/copy! h :foo-bar :fooBar)
       (hm/copy! h :boo-far :booFar)
       (is (= "hi" (:foo-bar @dst)))
-      (is (= "bye" (:boo-far @dst))))))
+      (is (= "bye" (:boo-far @dst)))))
+  (testing "Testing nest!"
+    (let [src {:fooBar "hi" :booFar "bye"}
+          dst (atom {})
+          h (hm/create src dst)]
+      (hm/nest! h :foo [] (fn [h] (hm/copy! h :bar :fooBar)))
+      (hm/nest! h :boo [] (fn [h] (hm/copy! h :far :booFar)))
+      (is (= "hi" (-> @dst :foo :bar)))
+      (is (= "bye" (-> @dst :boo :far)))))
+  )
 
 (enable-console-print!)
 

@@ -2,12 +2,9 @@
 
 (defprotocol IHammock
   (-copy! [this dst-key src-key d-fn])
-  (-nest! [this dst-key src-key]
-          [this dst-key src-key h-fn])
-  (-map! [this dst-key src-key]
-         [this dst-key src-key h-fn])
-  (-man! [this dst-ks value]
-         [this dst-ks value src-keys]))
+  (-nest! [this dst-key src-key h-fn])
+  (-map!  [this dst-key src-key h-fn])
+  (-man!  [this dst-ks value src-keys]))
 
 (defn- normalize-key
   [k]
@@ -33,6 +30,14 @@
       (swap! dst assoc-in dst-path src-val)
       (remember-anchors! src-path dst-path anchors)))
 
+  (-nest! [this dst-key src-key h-fn]
+    (let [dst-key (normalize-key dst-key)
+          src-key (normalize-key src-key)
+          src-path (concat src-path src-key)
+          dst-path (concat dst-path dst-key)
+          new-h (Hammock. src src-path dst dst-path anchors)]
+      (h-fn new-h)))
+
   ILookup
   (-lookup [this k]
     (-lookup this k nil))
@@ -52,6 +57,9 @@
   ([h dst-key src-key d-fn]
    (-copy! h dst-key src-key d-fn)))
 
-;; (nest! h :dest-key :src-key h-fn)
+(defn nest!
+  [h dst-key src-key h-fn]
+  (-nest! h dst-key src-key h-fn))
+
 ;; (map! h :dest-key :src-key h-fn)
 ;; (man! h :dest-key fn :src-keys)
