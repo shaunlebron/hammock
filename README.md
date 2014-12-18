@@ -15,7 +15,26 @@ Hammocks are a bit like [Om cursors], except they are anchored to two separate
 trees: a read-only "source" tree and write-only "destination" tree. The
 following functions are created to perform and remember simple transformations:
 
+## Creating
+
+You create a hammock by giving the constructor function an existing tree of
+data to be transformed.
+
 ```clj
+;; Create a hammock starting with some tree to be transformed.
+(def h (hm/create some-tree))
+```
+
+## Tree Builder Operations
+
+With this hammock, you can start building a new tree using hammock operations
+acting on the original tree.  All operations are tracked so you can relate the
+nodes in both trees.
+
+```clj
+;; NOTE: a "key" can be a keyword or a vector of keywords.
+;; it can also be [] to denote current path (TODO: must find allowed cases)
+
 ;; Set dest value to src value. Applying function to the src value if given.
 (hm/copy! h :dest-key :src-key data-fn?)
 
@@ -37,59 +56,23 @@ following functions are created to perform and remember simple transformations:
 ;; to assist in computing intermediate values that may be shared across multiple
 ;; `man!` commands.
 (:src-key h)
-
-;; NOTE: a "key" can be a keyword or a vector of keywords.
-;; it can also be [] to denote current path (TODO: must find allowed cases)
 ```
 
-All operations are tracked by an "anchor" map, which maps src paths to dest
-paths, representing the operations that took place during the transformation.
+## Reading Results
 
-## Examples
+After you are done building the new tree, you can read it out of the hammock object.
+You can also read out the "anchor" maps that map any given branch to the related
+branches in the other tree.
 
 ```clj
-(def old-tree (atom {:foo-bar "hello"
-                     :foo-baz "bye"
-                     :hum {:digMin 10
-                           :digMax 20
-                           :dupMin 12
-                           :dupMax 30}))
-(def new-tree (atom {}))
-(def anchors (atom {}))
+;; Retrieve the newly transformed tree.
+(hm/new-tree h)
 
-(require '[hammock.core :as hm])
+;; Retrieve the anchors representing the relationship between the two trees.
+(let [anchors (hm/anchors h)]
+  (:forward anchors)  ;; => maps old-path to related new-paths
+  (:inverse anchors)) ;; => maps new-path to related old-paths
 
-(def h (hm/create old-tree new-tree anchors))
-
-;; ============================================
-
-(hm/copy! h [:foo :bar] [:foo-bar])
-
-@new-tree
-;; => {:foo {:bar "hello"}}
-
-@anchors
-;; => {[:foo-bar] [:foo :bar]}
-
-;; ============================================
-
-(hm/copy! h [:foo :baz] [:foo-baz])
-
-@new-tree
-;; => {:foo {:bar "hello"
-             :baz "bye"}}
-
-@anchors
-;; => {[:foo-bar] [:foo :bar]
-       [:foo-baz] [:foo :baz]}
-
-;; ============================================
-
-;; nest! example
-;; map! example
-;; man! example
-;; ILookup example
 ```
-
 
 [Om cursors]: https://github.com/swannodette/om/wiki/Cursors

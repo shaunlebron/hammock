@@ -1,7 +1,8 @@
 (ns hammock.core)
 
 (defprotocol IHammock
-  (-dest [this])
+  (-new-tree [this])
+  (-old-tree [this])
   (-anchors [this])
   (-copy! [this dst-key src-key d-fn])
   (-nest! [this dst-key src-key h-fn])
@@ -29,7 +30,8 @@
 
 (deftype Hammock [src src-path dst dst-path anchors]
   IHammock
-  (-dest    [this] @dst)
+  (-old-tree [this] @src)
+  (-new-tree [this] @dst)
   (-anchors [this] @anchors)
 
   (-copy! [this dst-key src-key d-fn]
@@ -98,9 +100,13 @@
   ([h dst-key value src-keys]
    (-man! h dst-key value src-keys)))
 
-(defn dest
+(defn old-tree
   [h]
-  (-dest h))
+  (-old-tree h))
+
+(defn new-tree
+  [h]
+  (-new-tree h))
 
 (defn anchors
   [h]
