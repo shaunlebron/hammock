@@ -1,3 +1,9 @@
+## 0.1.1
+
+### bug fixes
+
+- `old-tree` no longer tries to deref its map
+
 ## 0.1.0
 
 ### initial features
