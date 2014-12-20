@@ -1,9 +1,10 @@
 # hammock
 
-Hammock is a ClojureScript library that helps you transform one tree into
-another and to remember related branches.
+a cljs library that helps you transform one tree into another and to remember related branches.
 
 [![Clojars Project](http://clojars.org/hammock/latest-version.svg)](http://clojars.org/hammock)
+
+![illustration](hammock.png)
 
 ## Rationale
 
