@@ -17,6 +17,8 @@ This is an experiment to capture that relationship during the actual process of
 transformation, by performing the transformation with objects we are calling
 "hammocks."
 
+## Description
+
 Hammocks are a bit like [Om cursors], except they are anchored to two separate
 trees: a read-only "source" tree and write-only "destination" tree. These
 anchor points on the hammock move along their respective trees as data is
