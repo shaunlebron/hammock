@@ -1,3 +1,11 @@
+## 0.2.0
+
+### changes
+
+- `old-tree` renamed to `src-tree`
+- `new-tree` renamed to `dst-tree`
+- add `result` function for retrieving destination tree with `:anchors` metadata
+
 ## 0.1.1
 
 ### bug fixes

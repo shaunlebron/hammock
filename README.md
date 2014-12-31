@@ -34,7 +34,7 @@ are.
 
 ## Usage
 
-Add `[hammock "0.1.1"]` to your dependencies vector in project.clj.
+Add `[hammock "0.2.0"]` to your dependencies vector in project.clj.
 
 ```clj
 (ns example
