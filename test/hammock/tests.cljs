@@ -8,8 +8,8 @@
     (let [src {:foo "bar" :bar ["hi" "there"]}
           dst (atom {:hello "world"})
           h (hm/create src dst)]
-      (is (= src (hm/old-tree h)))
-      (is (= @dst (hm/new-tree h)))
+      (is (= src (hm/src-tree h)))
+      (is (= @dst (hm/dst-tree h)))
       (is (= {} (hm/anchors h)))))
   (testing "Testing lookup"
     (let [src {:foo "bar" :bar ["hi" "there"]}
