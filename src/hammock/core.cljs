@@ -111,3 +111,9 @@
 (defn anchors
   [h]
   (-anchors h))
+
+(defn result
+  [h]
+  (with-meta
+    (dst-tree h)
+    {:anchors (anchors h)}))

@@ -37,7 +37,12 @@
       (hm/copy! h :boo-far :booFar)
       (is (= "hi" (:foo-bar @dst)))
       (is (= "bye" (:boo-far @dst)))
-      (is (= @anchors expected-anchors))))
+      (is (= @anchors expected-anchors))
+      (let [result (hm/result h)
+            expected-result {:foo-bar "hi" :boo-far "bye"}
+            result-anchors (-> result meta :anchors)]
+        (is (= result expected-result))
+        (is (= result-anchors expected-anchors)))))
   (testing "Testing nest!"
     (let [src {:fooBar "hi" :booFar "bye"}
           dst (atom {})

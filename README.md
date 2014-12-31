@@ -86,10 +86,12 @@ branches in the other tree.
 
 ```clj
 ;; Retrieve the newly transformed tree.
-(hm/new-tree h)
+(hm/result h)
 
-;; Retrieve the anchors representing the relationship between the two trees.
-(let [anchors (hm/anchors h)]
+;; The anchors representing the relationship between the two trees is attached
+;; as metadata to the result.
+(let [result (hm/result h)
+      anchors (-> result meta :anchors)]
   (:forward anchors)  ;; => maps old-path to related new-paths
   (:inverse anchors)) ;; => maps new-path to related old-paths
 ```
