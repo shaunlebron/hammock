@@ -49,7 +49,7 @@ Well sometimes a destination value can depend on multiple source values:
 ```clj
 {:my-foo {:value 1}
  :my-bar {:value 2}
- :sum    {:value 3}}   ;; <--- myFoo + myBar
+ :sum    {:value 3}} ;; <--- myFoo + myBar
 ```
 
 So a source->destination mapping would now look like:
@@ -57,8 +57,10 @@ So a source->destination mapping would now look like:
 ```
 SRC-KEYS         DST-KEYS
 ----------------------------------------
-[:myFoo]  ---->  [:my-foo :value] [:sum]
-[:myBar]  ---->  [:my-bar :value] [:sum]
+[:myFoo]  ---->  [:my-foo :value]
+                 [:sum]
+[:myBar]  ---->  [:my-bar :value]
+                 [:sum]
 ```
 
 And a destination->source mapping would look like:
@@ -68,7 +70,8 @@ DST-KEYS                 SRC-KEYS
 ------------------------------------------
 [:my-foo :value]  ---->  [:myFoo]
 [:my-bar :value]  ---->  [:myBar]
-[:sum]            ---->  [:myFoo] [:myBar]
+[:sum]            ---->  [:myFoo]
+                         [:myBar]
 ```
 
 ## Using hammock
@@ -97,11 +100,11 @@ keys between the formats.
 ```clj
 (-> dst meta :anchors :forward)
 ;; => {[:myFoo] #{[:my-foo :value]}
-       [:myBar] #{[:my-bar :value]}}
+;;     [:myBar] #{[:my-bar :value]}}
 
 (-> dst meta :anchors :inverse)
 ;; => {[:my-foo :value] #{[:myFoo]}
-       [:my-bar :value] #{[:myBar]}}
+;;     [:my-bar :value] #{[:myBar]}}
 ```
 
 There is a command for manually setting a destination value and its dependent source keys:
@@ -123,12 +126,12 @@ And the new result will reflect the addition:
 
 (-> dst meta :anchors :forward)
 ;; => {[:myFoo] #{[:my-foo :value] [:sum]}
-       [:myBar] #{[:my-bar :value] [:sum]}}
+;;     [:myBar] #{[:my-bar :value] [:sum]}}
 
 (-> dst meta :anchors :inverse)
 ;; => {[:my-foo :value] #{[:myFoo]}
-       [:my-bar :value] #{[:myBar]}
-       [:sum]           #{[:myFoo] [:myBar]}}
+;;     [:my-bar :value] #{[:myBar]}
+;;     [:sum]           #{[:myFoo] [:myBar]}}
 ```
 
 ## Details
