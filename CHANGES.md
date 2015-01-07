@@ -1,3 +1,9 @@
+## 0.2.1
+
+### changes
+
+- operations return the current destination tree value
+
 ## 0.2.0
 
 ### changes

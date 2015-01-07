@@ -20,7 +20,7 @@ and destination branches.
 Add to your dependencies vector in project.clj:
 
 ```
-[hammock "0.2.0"]
+[hammock "0.2.1"]
 ```
 
 ```clj
