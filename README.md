@@ -91,9 +91,7 @@ DST-KEYS                 SRC-KEYS
 
 ## Using hammock
 
-You can perform such data transformations using __hammock__:
-
-(If you want to follow along from a REPL, do the following):
+The following examples can be run from a REPL:
 
 ```
 $ ./scripts/compile_cljsc   # one-time only
