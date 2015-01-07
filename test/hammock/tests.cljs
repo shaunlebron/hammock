@@ -102,7 +102,3 @@
       (is (= "byehi" (-> @dst :boo :far)))
       (is (= @anchors expected-anchors)))))
 
-(enable-console-print!)
-
-(run-tests)
-

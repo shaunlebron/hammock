@@ -275,14 +275,9 @@ You can see the resulting anchors below:
 
 ## Running tests
 
-1. Build the tests.
-
-    ```
-    lein cljsbuild auto
-    ```
-
-1. Open "script/run_tests.html" in a browser.
-1. See test results in javascript console.
+```
+$ lein cljsbuild test
+```
 
 ## License
 

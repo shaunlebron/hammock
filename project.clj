@@ -17,6 +17,7 @@
                   "scripts/hammock.test.js.map"]
 
   :cljsbuild {
+    :test-commands {"test" ["phantomjs" "scripts/unit-test.js" "scripts/unit-test.html"]}
     :builds [{:id "test"
               :source-paths ["src" "test"]
               :compiler {
