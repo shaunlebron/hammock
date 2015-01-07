@@ -144,7 +144,7 @@ to vectors of keywords)
 ### Manual writing
 
 There is a command for manually setting a destination value, which is useful
-for a computing destination value from multiple source values.
+for computing destination value from multiple source values.
 
 ```clj
 (def sum (+ (:foo src) (:bar src)))
