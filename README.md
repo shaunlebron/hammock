@@ -33,8 +33,8 @@ Add to your dependencies vector in project.clj:
 Suppose you have a data in some source format:
 
 ```clj
-{:myFoo 1
- :myBar 2}
+{:foo 1
+ :bar 2}
 ```
 
 And you want to transform it into some destination format:
@@ -47,10 +47,10 @@ And you want to transform it into some destination format:
 Also, you want to remember the mapping between the two formats:
 
 ```
-SRC-KEYS         DST-KEYS
+SRC-KEYS        DST-KEYS
 ----------------------------------
-[:myFoo]  <--->  [:my-foo :value]
-[:myBar]  <--->  [:my-bar :value]
+[:foo]  <--->  [:my-foo :value]
+[:bar]  <--->  [:my-bar :value]
 ```
 
 Well sometimes a destination value can depend on multiple source values:
@@ -58,18 +58,18 @@ Well sometimes a destination value can depend on multiple source values:
 ```clj
 {:my-foo {:value 1}
  :my-bar {:value 2}
- :sum    {:value 3}} ;; <--- myFoo + myBar
+ :sum    {:value 3}} ;; <--- foo + bar
 ```
 
 So a source->destination mapping would now look like:
 
 ```
-SRC-KEYS         DST-KEYS
+SRC-KEYS       DST-KEYS
 ----------------------------------------
-[:myFoo]  ---->  [:my-foo :value]
-                 [:sum    :value]
-[:myBar]  ---->  [:my-bar :value]
-                 [:sum    :value]
+[:foo]  ---->  [:my-foo :value]
+               [:sum    :value]
+[:bar]  ---->  [:my-bar :value]
+               [:sum    :value]
 ```
 
 And a destination->source mapping would look like:
@@ -77,10 +77,10 @@ And a destination->source mapping would look like:
 ```
 DST-KEYS                 SRC-KEYS
 ------------------------------------------
-[:my-foo :value]  ---->  [:myFoo]
-[:my-bar :value]  ---->  [:myBar]
-[:sum    :value]  ---->  [:myFoo]
-                         [:myBar]
+[:my-foo :value]  ---->  [:foo]
+[:my-bar :value]  ---->  [:bar]
+[:sum    :value]  ---->  [:foo]
+                         [:bar]
 ```
 
 ## Using hammock
@@ -99,11 +99,11 @@ cljs.user> (require '[hammock.core :as hm])
 Start with a simple hammock transformation:
 
 ```clj
-(def src {:myFoo 1 :myBar 2})
+(def src {:foo 1 :bar 2})
 
 (def h (hm/create src))
-(hm/copy! h [:my-foo :value] :myFoo)
-(hm/copy! h [:my-bar :value] :myBar)
+(hm/copy! h [:my-foo :value] :foo)
+(hm/copy! h [:my-bar :value] :bar)
 ```
 
 And it will produce the desired destination format:
@@ -119,14 +119,14 @@ keys between the formats.
 
 ```clj
 (-> dst meta :anchors :forward)
-;;     SRC-KEYS     DST-KEYS
-;; => {[:myFoo]   #{[:my-foo :value]}
-;;     [:myBar]   #{[:my-bar :value]}}
+;;     SRC-KEYS   DST-KEYS
+;; => {[:foo]   #{[:my-foo :value]}
+;;     [:bar]   #{[:my-bar :value]}}
 
 (-> dst meta :anchors :inverse)
 ;;     DST-KEYS            SRC-KEYS
-;; => {[:my-foo :value]  #{[:myFoo]}
-;;     [:my-bar :value]  #{[:myBar]}}
+;; => {[:my-foo :value]  #{[:foo]}
+;;     [:my-bar :value]  #{[:bar]}}
 ```
 
 ### Manual writing
@@ -135,7 +135,7 @@ There is a command for manually setting a destination value, which is useful
 for a computing destination value from multiple source values.
 
 ```clj
-(def sum (+ (:myFoo src) (:myBar src)))
+(def sum (+ (:foo src) (:bar src)))
 (hm/man! h [:sum :value] sum)
 ```
 
@@ -143,7 +143,7 @@ You can include optional dependent source keys as the last argument so we can
 trace those keys to our computed value:
 
 ```clj
-(hm/man! h [:sum :value] sum [:myFoo :myBar])
+(hm/man! h [:sum :value] sum [:foo :bar])
 ```
 
 And the new result will reflect the addition:
@@ -156,17 +156,17 @@ And the new result will reflect the addition:
 
 (-> dst meta :anchors :forward)
 ;;     SRC-KEYS     DST-KEYS
-;; => {[:myFoo]   #{[:my-foo :value]
-;;                  [:sum    :value]}
-;;     [:myBar]   #{[:my-bar :value]
-;;                  [:sum    :value]}}
+;; => {[:foo]   #{[:my-foo :value]
+;;                [:sum    :value]}
+;;     [:bar]   #{[:my-bar :value]
+;;                [:sum    :value]}}
 
 (-> dst meta :anchors :inverse)
 ;;     DST-KEYS            SRC-KEYS
-;; => {[:my-foo :value]  #{[:myFoo]}
-;;     [:my-bar :value]  #{[:myBar]}
-;;     [:sum    :value]  #{[:myFoo]
-;;                         [:myBar]}}
+;; => {[:my-foo :value]  #{[:foo]}
+;;     [:my-bar :value]  #{[:bar]}
+;;     [:sum    :value]  #{[:foo]
+;;                         [:bar]}}
 ```
 
 ### Composability
@@ -176,8 +176,8 @@ hammock object `h`:
 
 ```clj
 (defn unpack-thing [h]
-  (hm/copy! h [:my-foo :value] :myFoo)
-  (hm/copy! h [:my-bar :value] :myBar))
+  (hm/copy! h [:my-foo :value] :foo)
+  (hm/copy! h [:my-bar :value] :bar))
 ```
 
 We can then use this function to perform sub-transformations.  We do this by
@@ -204,11 +204,11 @@ And we can update `unpack-thing` to manually create a sum value:
 
 ```clj
 (defn unpack-thing [h]
-  (hm/copy! h [:my-foo :value] :myFoo)
-  (hm/copy! h [:my-bar :value] :myBar)
+  (hm/copy! h [:my-foo :value] :foo)
+  (hm/copy! h [:my-bar :value] :bar)
 
-  (let [sum (+ (:myFoo h) (:myBar h))
-        keys-used [:myFoo :myBar]]
+  (let [sum (+ (:foo h) (:bar h))
+        keys-used [:foo :bar]]
     (hm/man! h [:sum :value] sum keys-used)))
 
 (hm/nest! h :my-a :a unpack-thing)
@@ -223,7 +223,7 @@ And we can update `unpack-thing` to manually create a sum value:
 ;;            :sum    {:value 7}}} ;; <-- added sum
 ```
 
-__IMPORTANT__: `(:myFoo h)` is a helpful shorthand for reading source values at the
+__IMPORTANT__: `(:foo h)` is a helpful shorthand for reading source values at the
 current hammock position.
 
 ### Sequences
@@ -250,27 +250,27 @@ There is support for simple 1-to-1 vector transformations using `hm/map!`.
 You can see the resulting anchors below:
 
 ```clj
-(-> dst meta :anchors :forward)
+-> dst meta :anchors :forward)
 ;;     SRC-KEYS               DST-KEYS
-;; => {[:vals 0 :myFoo]     #{[:my-vals 0 :my-foo :value]
-;;                            [:my-vals 0 :sum    :value]}
-;;     [:vals 0 :myBar]     #{[:my-vals 0 :my-bar :value]
-;;                            [:my-vals 0 :sum    :value]}
-;;     [:vals 1 :myFoo]     #{[:my-vals 1 :my-foo :value]
-;;                            [:my-vals 1 :sum    :value]}
-;;     [:vals 1 :myBar]     #{[:my-vals 1 :my-bar :value]
-;;                            [:my-vals 1 :sum    :value]}}
+;; => {[:vals 0 :foo]     #{[:my-vals 0 :my-foo :value]
+;;                          [:my-vals 0 :sum    :value]}
+;;     [:vals 0 :bar]     #{[:my-vals 0 :my-bar :value]
+;;                          [:my-vals 0 :sum    :value]}
+;;     [:vals 1 :foo]     #{[:my-vals 1 :my-foo :value]
+;;                          [:my-vals 1 :sum    :value]}
+;;     [:vals 1 :bar]     #{[:my-vals 1 :my-bar :value]
+;;                          [:my-vals 1 :sum    :value]}}
 
 (-> dst meta :anchors :inverse)
 ;;     DST-KEYS                        SRC-KEYS
-;; => {[:my-vals 0 :my-foo :value]   #{[:vals 0 :myFoo]}
-;;     [:my-vals 0 :my-bar :value]   #{[:vals 0 :myBar]}
-;;     [:my-vals 0 :sum    :value]   #{[:vals 0 :myFoo]
-;;                                     [:vals 0 :myBar]}
-;;     [:my-vals 1 :my-foo :value]   #{[:vals 1 :myFoo]}
-;;     [:my-vals 1 :my-bar :value]   #{[:vals 1 :myBar]}
-;;     [:my-vals 1 :sum    :value]   #{[:vals 1 :myFoo]
-;;                                     [:vals 1 :myBar]}}
+;; => {[:my-vals 0 :my-foo :value]   #{[:vals 0 :foo]}
+;;     [:my-vals 0 :my-bar :value]   #{[:vals 0 :bar]}
+;;     [:my-vals 0 :sum    :value]   #{[:vals 0 :foo]
+;;                                     [:vals 0 :bar]}
+;;     [:my-vals 1 :my-foo :value]   #{[:vals 1 :foo]}
+;;     [:my-vals 1 :my-bar :value]   #{[:vals 1 :bar]}
+;;     [:my-vals 1 :sum    :value]   #{[:vals 1 :foo]
+;;                                     [:vals 1 :bar]}}
 ```
 
 ## Running tests
