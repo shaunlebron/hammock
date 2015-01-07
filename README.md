@@ -211,7 +211,7 @@ And we can update `unpack-thing` to manually create a sum value:
   (hm/copy! h [:my-foo :value] :foo)
   (hm/copy! h [:my-bar :value] :bar)
 
-  (let [sum (+ (:foo h) (:bar h))
+  (let [sum (+ (:foo h) (:bar h))  ;; <-- lookups on a hammock return source values
         keys-used [:foo :bar]]
     (hm/man! h [:sum :value] sum keys-used)))
 
@@ -226,9 +226,6 @@ And we can update `unpack-thing` to manually create a sum value:
 ;;            :my-bar {:value 4}
 ;;            :sum    {:value 7}}} ;; <-- added sum
 ```
-
-__IMPORTANT__: `(:foo h)` is a helpful shorthand for reading source values at the
-current hammock position.
 
 ### Sequences
 
