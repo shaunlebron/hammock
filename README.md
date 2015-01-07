@@ -36,7 +36,7 @@ Add to your dependencies vector in project.clj:
 
 ## Transforms and Mappings
 
-Suppose you have a data in some source format:
+Suppose you have data in some source format:
 
 ```clj
 {:foo 1
