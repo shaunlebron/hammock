@@ -6,6 +6,15 @@ a cljs library that helps you transform one tree into another and to remember re
 
 ![illustration](hammock.png)
 
+Hammocks are a bit like [Om cursors], except they are anchored to two separate
+trees: a read-only "source" tree and write-only "destination" tree. These
+anchor points on the hammock move along their respective trees as data is
+transformed from source to destination.  A log of the anchor positions is kept
+for each transformation in order to remember the relationship between source
+and destination branches.
+
+(Motivated by the desire to track complex frontend <--> backend data transformations.)
+
 ## Usage
 
 Add to your dependencies vector in project.clj:
@@ -38,7 +47,7 @@ And you want to transform it into some destination format:
 Also, you want to remember the mapping between the two formats:
 
 ```
-SRC-KEYS       DST-KEYS
+SRC-KEYS         DST-KEYS
 ----------------------------------
 [:myFoo]  <--->  [:my-foo :value]
 [:myBar]  <--->  [:my-bar :value]
@@ -58,9 +67,9 @@ So a source->destination mapping would now look like:
 SRC-KEYS         DST-KEYS
 ----------------------------------------
 [:myFoo]  ---->  [:my-foo :value]
-                 [:sum]
+                 [:sum :value]
 [:myBar]  ---->  [:my-bar :value]
-                 [:sum]
+                 [:sum :value]
 ```
 
 And a destination->source mapping would look like:
@@ -70,7 +79,7 @@ DST-KEYS                 SRC-KEYS
 ------------------------------------------
 [:my-foo :value]  ---->  [:myFoo]
 [:my-bar :value]  ---->  [:myBar]
-[:sum]            ---->  [:myFoo]
+[:sum :value]     ---->  [:myFoo]
                          [:myBar]
 ```
 
@@ -99,21 +108,31 @@ keys between the formats.
 
 ```clj
 (-> dst meta :anchors :forward)
-;; => {[:myFoo] #{[:my-foo :value]}
-;;     [:myBar] #{[:my-bar :value]}}
+;;     SRC-KEYS     DST-KEYS
+;; => {[:myFoo]   #{[:my-foo :value]}
+;;     [:myBar]   #{[:my-bar :value]}}
 
 (-> dst meta :anchors :inverse)
-;; => {[:my-foo :value] #{[:myFoo]}
-;;     [:my-bar :value] #{[:myBar]}}
+;;     DST-KEYS            SRC-KEYS
+;; => {[:my-foo :value]  #{[:myFoo]}
+;;     [:my-bar :value]  #{[:myBar]}}
 ```
 
-There is a command for manually setting a destination value and its dependent source keys:
+### Manual writing
+
+There is a command for manually setting a destination value, which is useful
+for a computing destination value from multiple source values.
 
 ```clj
-(let [foo (:myFoo h)
-      bar (:myBar h)
-      sum (+ foo bar)]
-  (hm/man! h :sum sum [:myFoo :myBar]))
+(def sum (+ (:myFoo src) (:myBar src)))
+(hm/man! h [:sum :value] sum)
+```
+
+You can include optional dependent source keys as the last argument so we can
+trace those keys to our computed value:
+
+```clj
+(hm/man! h [:sum :value] sum [:myFoo :myBar])
 ```
 
 And the new result will reflect the addition:
@@ -125,77 +144,122 @@ And the new result will reflect the addition:
 ;;     :sum    {:value 3}}
 
 (-> dst meta :anchors :forward)
-;; => {[:myFoo] #{[:my-foo :value] [:sum]}
-;;     [:myBar] #{[:my-bar :value] [:sum]}}
+;;     SRC-KEYS     DST-KEYS
+;; => {[:myFoo]   #{[:my-foo :value]
+;;                  [:sum :value]}
+;;     [:myBar]   #{[:my-bar :value]
+;;                  [:sum :value]}}
 
 (-> dst meta :anchors :inverse)
-;; => {[:my-foo :value] #{[:myFoo]}
-;;     [:my-bar :value] #{[:myBar]}
-;;     [:sum]           #{[:myFoo] [:myBar]}}
+;;     DST-KEYS            SRC-KEYS
+;; => {[:my-foo :value]  #{[:myFoo]}
+;;     [:my-bar :value]  #{[:myBar]}
+;;     [:sum :value]     #{[:myFoo]
+;;                         [:myBar]}}
 ```
 
-## Details
+### Composability
 
-Hammocks are a bit like [Om cursors], except they are anchored to two separate
-trees: a read-only "source" tree and write-only "destination" tree. These
-anchor points on the hammock move along their respective trees as data is
-transformed from source to destination.  A log of the anchor positions is kept
-for each transformation in order to remember the relationship between source
-and destination branches.
+We can create composable transformations using functions that take a
+hammock object `h`:
 
-You create a hammock by giving the constructor function an existing tree of
-data to be transformed.
-
+```clj
+(defn unpack-thing [h]
+  (hm/copy! h [:my-foo :value] :myFoo)
+  (hm/copy! h [:my-bar :value] :myBar))
 ```
-;; Create a hammock starting with some tree to be transformed.
+
+We can then use this function to perform sub-transformations.  We do this by
+passing the function to `hm/nest!`, causing it to receive a relative hammock
+whose anchors are moved to the given keys.
+
+```clj
+(def src {:a {:foo 1 :bar 2}
+          :b {:foo 3 :bar 4}})
+
 (def h (hm/create src))
-```
 
-With this hammock, you can start building a new tree using hammock operations
-acting on the original tree.  All operations are tracked so you can relate the
-nodes in both trees.
+(hm/nest! h :my-a :a unpack-thing)
+(hm/nest! h :my-b :b unpack-thing)
 
-```clj
-;; NOTE: a "key" can be a keyword or a vector of keywords.
-;; it can also be [] to denote current path (TODO: must find allowed cases)
-
-;; Set dest value to src value. Applying function to the src value if given.
-(hm/copy! h :dest-key :src-key data-fn?)
-
-;; Start a nested transaction by moving the hammock to the given relative keys,
-;; and passing it to the given function.
-(hm/nest! h :dest-key :src-key hammock-fn)
-
-;; Map the src seq to the dest seq with the given hammock function.  (If you wish
-;; to use a function that doesn't take a hammock, use copy! with a mapv function.
-;; Nested operations will not be remembered though)
-(hm/map! h :dest-key :src-key hammock-fn)
-
-;; Manually set dest to the given value. Optionally include a set of src-keys used
-;; to compute the value. This is intended to be used when a dest value depends on
-;; multiple src values or vice versa.
-(hm/man! h :dest-key value src-keys?)
-
-;; Lookup operations are performed on the read-only "source" tree.  It is intended
-;; to assist in computing intermediate values that may be shared across multiple
-;; `man!` commands.
-(:src-key h)
-```
-
-After you are done building the new tree, you can read it out of the hammock object.
-You can also read out the "anchor" maps that map any given branch to the related
-branches in the other tree.
-
-```clj
-;; Retrieve the newly transformed tree.
 (hm/result h)
+;; => {:my-a {:my-foo {:value 1}
+;;            :my-bar {:value 2}}
+;;     :my-b {:my-foo {:value 3}
+;;            :my-bar {:value 4}}}
+```
 
-;; The anchors representing the relationship between the two trees is attached
-;; as metadata to the result.
-(let [result (hm/result h)
-      anchors (-> result meta :anchors)]
-  (:forward anchors)  ;; => maps old-path to related new-paths
-  (:inverse anchors)) ;; => maps new-path to related old-paths
+And we can update `unpack-thing` to manually create a sum value:
+
+```clj
+(defn unpack-thing [h]
+  (hm/copy! h [:my-foo :value] :myFoo)
+  (hm/copy! h [:my-bar :value] :myBar)
+
+  (let [sum (+ (:myFoo h) (:myBar h))
+        keys-used [:myFoo :myBar]]
+    (hm/man! h [:sum :value] sum keys-used)))
+
+(hm/nest! h :my-a :a unpack-thing)
+(hm/nest! h :my-b :b unpack-thing)
+
+(hm/result h)
+;; => {:my-a {:my-foo {:value 1}
+;;            :my-bar {:value 2}
+;;            :sum    {:value 3}}  ;; <-- added sum
+;;     :my-b {:my-foo {:value 3}
+;;            :my-bar {:value 4}
+;;            :sum    {:value 7}}} ;; <-- added sum
+```
+
+__IMPORTANT__: `(:myFoo h)` is a helpful shorthand for reading source values at the
+current hammock position.
+
+### Sequences
+
+There is support for simple 1-to-1 vector transformations using `hm/map!`.
+
+```clj
+(def src {:vals [{:foo 1 :bar 2}
+                 {:foo 3 :bar 4}]})
+
+(def h (hm/create src))
+
+(hm/map! h :my-vals :vals unpack-thing)
+
+(def dst (hm/result h))
+;; => {:my-vals [{:my-foo {:value 1}
+;;                :my-bar {:value 2}
+;;                :sum    {:value 3}}
+;;               {:my-foo {:value 3}
+;;                :my-bar {:value 4}
+;;                :sum    {:value 7}}]}
+```
+
+You can see the resulting anchors below:
+
+```clj
+(-> dst meta :anchors :forward)
+;;     SRC-KEYS               DST-KEYS
+;; => {[:vals 0 :myFoo]     #{[:my-vals 0 :my-foo :value]
+;;                            [:my-vals 0 :sum    :value]}
+;;     [:vals 0 :myBar]     #{[:my-vals 0 :my-bar :value]
+;;                            [:my-vals 0 :sum    :value]}
+;;     [:vals 1 :myFoo]     #{[:my-vals 1 :my-foo :value]
+;;                            [:my-vals 1 :sum    :value]}
+;;     [:vals 1 :myBar]     #{[:my-vals 1 :my-bar :value]
+;;                            [:my-vals 1 :sum    :value]}}
+
+(-> dst meta :anchors :inverse)
+;;     DST-KEYS                        SRC-KEYS
+;; => {[:my-vals 0 :my-foo :value]   #{[:vals 0 :myFoo]}
+;;     [:my-vals 0 :my-bar :value]   #{[:vals 0 :myBar]}
+;;     [:my-vals 0 :sum    :value]   #{[:vals 0 :myFoo]
+;;                                     [:vals 0 :myBar]}
+;;     [:my-vals 1 :my-foo :value]   #{[:vals 1 :myFoo]}
+;;     [:my-vals 1 :my-bar :value]   #{[:vals 1 :myBar]}
+;;     [:my-vals 1 :sum    :value]   #{[:vals 1 :myFoo]
+;;                                     [:vals 1 :myBar]}}
 ```
 
 ## Running tests
