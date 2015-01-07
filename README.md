@@ -100,17 +100,24 @@ $ ./scripts/repl
 cljs.user> (require '[hammock.core :as hm])
 ```
 
-Start with a simple hammock transformation:
+Create a hammock `h` to transform a source tree `src`:
 
 ```clj
 (def src {:foo 1 :bar 2})
-
 (def h (hm/create src))
+```
+
+Use `hm/copy!` to perform simple copies to the destination tree using the given
+destination and source keys.  (They can be a keyword or a vector of keywords)
+
+
+```clj
+;;          DST-KEY          SRC-KEY
 (hm/copy! h [:my-foo :value] :foo)
 (hm/copy! h [:my-bar :value] :bar)
 ```
 
-And it will produce the desired destination format:
+And use `hm/result` to get the transformed destination tree:
 
 ```clj
 (def dst (hm/result h))
@@ -118,8 +125,9 @@ And it will produce the desired destination format:
 ;;     :my-bar {:value 2}}
 ```
 
-And the `:anchors` metadata will remember the forward/inverse mappings of the
-keys between the formats.
+The `:anchors` metadata on the result will remember the forward/inverse
+mappings of the keys between the formats. (Notice the keys are normalized
+to vectors of keywords)
 
 ```clj
 (-> dst meta :anchors :forward)
@@ -211,7 +219,7 @@ And we can update `unpack-thing` to manually create a sum value:
   (hm/copy! h [:my-foo :value] :foo)
   (hm/copy! h [:my-bar :value] :bar)
 
-  (let [sum (+ (:foo h) (:bar h))  ;; <-- lookups on a hammock return source values
+  (let [sum (+ (:foo h) (:bar h))  ;; <-- NOTE: lookups on a hammock return source values
         keys-used [:foo :bar]]
     (hm/man! h [:sum :value] sum keys-used)))
 
