@@ -4,14 +4,22 @@ a cljs library that helps you transform one tree into another and to remember re
 
 ![illustration](hammock.png)
 
+In UIs, it is common to transform JSON data received from a backend REST
+service into data better suited for representation on screen.  After this
+transformation is made, it is useful to remember which original fields are
+associated with the new ones (e.g. for highlighting invalid UI fields based on
+backend-validated JSON fields)
+
+This is an experiment to capture that relationship during the actual process of
+transformation, by performing the transformation with objects we are calling
+"hammocks."
+
 Hammocks are a bit like [Om cursors], except they are anchored to two separate
 trees: a read-only "source" tree and write-only "destination" tree. These
 anchor points on the hammock move along their respective trees as data is
 transformed from source to destination.  A log of the anchor positions is kept
 for each transformation in order to remember the relationship between source
 and destination branches.
-
-(Motivated by the desire to track complex frontend <--> backend data transformations.)
 
 ## Usage
 
