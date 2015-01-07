@@ -87,6 +87,17 @@ DST-KEYS                 SRC-KEYS
 
 You can perform such data transformations using __hammock__:
 
+(If you want to follow along from a REPL, do the following):
+
+```
+$ ./scripts/compile_cljsc   # one-time only
+$ ./scripts/repl
+
+cljs.user> (require '[hammock.core :as hm])
+```
+
+Start with a simple hammock transformation:
+
 ```clj
 (def src {:myFoo 1 :myBar 2})
 

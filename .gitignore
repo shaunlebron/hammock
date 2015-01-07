@@ -3,7 +3,7 @@ pom.xml.asc
 *jar
 /lib/
 /classes/
-/script/out/
+/scripts/out/
 /target/
 *.js
 *.js.map
@@ -11,4 +11,4 @@ pom.xml.asc
 .lein-repl-history
 .lein-plugins/
 *.swp
-
+/out/
