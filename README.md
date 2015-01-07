@@ -1,8 +1,6 @@
-# hammock
+# hammock [![Build Status](https://travis-ci.org/shaunlebron/hammock.svg)](https://travis-ci.org/shaunlebron/hammock)
 
 a cljs library that helps you transform one tree into another and to remember related branches.
-
-[![Clojars Project](http://clojars.org/hammock/latest-version.svg)](http://clojars.org/hammock) [![Build Status](https://travis-ci.org/shaunlebron/hammock.svg)](https://travis-ci.org/shaunlebron/hammock)
 
 ![illustration](hammock.png)
 
