@@ -39,13 +39,15 @@
           dst-path (join-path dst-path dst-key)
           src-val (d-fn (get-in src src-path))]
       (swap! dst assoc-in dst-path src-val)
-      (remember-anchors! src-path dst-path anchors)))
+      (remember-anchors! src-path dst-path anchors)
+      @dst))
 
   (-nest! [this dst-key src-key h-fn]
     (let [src-path (join-path src-path src-key)
           dst-path (join-path dst-path dst-key)
           new-h (Hammock. src src-path dst dst-path anchors)]
-      (h-fn new-h)))
+      (h-fn new-h)
+      @dst))
 
   (-map! [this dst-key src-key h-fn]
     (let [src-path (join-path src-path src-key)
@@ -56,14 +58,16 @@
         (let [src-path (join-path src-path i)
               dst-path (join-path dst-path i)
               new-h (Hammock. src src-path dst dst-path anchors)]
-          (h-fn new-h)))))
+          (h-fn new-h)))
+      @dst))
 
   (-man! [this dst-key value src-keys]
     (let [dst-path (join-path dst-path dst-key)]
       (swap! dst assoc-in dst-path value)
       (doseq [k src-keys]
         (let [src-path (join-path src-path k)]
-          (remember-anchors! src-path dst-path anchors)))))
+          (remember-anchors! src-path dst-path anchors)))
+      @dst))
 
   ILookup
   (-lookup [this k]
