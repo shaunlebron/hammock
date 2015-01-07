@@ -67,9 +67,9 @@ So a source->destination mapping would now look like:
 SRC-KEYS         DST-KEYS
 ----------------------------------------
 [:myFoo]  ---->  [:my-foo :value]
-                 [:sum :value]
+                 [:sum    :value]
 [:myBar]  ---->  [:my-bar :value]
-                 [:sum :value]
+                 [:sum    :value]
 ```
 
 And a destination->source mapping would look like:
@@ -79,7 +79,7 @@ DST-KEYS                 SRC-KEYS
 ------------------------------------------
 [:my-foo :value]  ---->  [:myFoo]
 [:my-bar :value]  ---->  [:myBar]
-[:sum :value]     ---->  [:myFoo]
+[:sum    :value]  ---->  [:myFoo]
                          [:myBar]
 ```
 
@@ -146,15 +146,15 @@ And the new result will reflect the addition:
 (-> dst meta :anchors :forward)
 ;;     SRC-KEYS     DST-KEYS
 ;; => {[:myFoo]   #{[:my-foo :value]
-;;                  [:sum :value]}
+;;                  [:sum    :value]}
 ;;     [:myBar]   #{[:my-bar :value]
-;;                  [:sum :value]}}
+;;                  [:sum    :value]}}
 
 (-> dst meta :anchors :inverse)
 ;;     DST-KEYS            SRC-KEYS
 ;; => {[:my-foo :value]  #{[:myFoo]}
 ;;     [:my-bar :value]  #{[:myBar]}
-;;     [:sum :value]     #{[:myFoo]
+;;     [:sum    :value]  #{[:myFoo]
 ;;                         [:myBar]}}
 ```
 
