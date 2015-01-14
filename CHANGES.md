@@ -1,3 +1,7 @@
+## 0.2.2
+
+- 0.2.1 was deployed with `cljs` and `clojure` class files for some reason...
+
 ## 0.2.1
 
 ### changes

@@ -1,4 +1,4 @@
-(defproject hammock "0.2.1"
+(defproject hammock "0.2.2"
   :description "tie two trees together to track a transformation"
   :url "https://github.com/shaunlebron/hammock"
 
@@ -6,7 +6,7 @@
             [lein-npm "0.4.0"]]
 
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2665"]]
+                 [org.clojure/clojurescript "0.0-2665" :scope "provided"]]
 
   :node-dependencies [[source-map-support "0.2.8"]]
 
