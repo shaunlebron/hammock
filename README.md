@@ -288,6 +288,16 @@ You can see the resulting anchors below:
 $ lein cljsbuild test
 ```
 
+## Similar Technologies
+
+The following technologies transform a JSON tree into another JSON tree.  Each
+allows specification of a desired transform using declarative, custom
+expressions.
+
+- [jq](http://stedolan.github.io/jq/): (for command-line)
+- [jolt](https://github.com/bazaarvoice/jolt): (for Java)
+- [json2json](https://github.com/joelvh/json2json): (for JS)
+
 ## License
 
 Copyright © 2014 Shaun Williams
