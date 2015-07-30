@@ -1,3 +1,7 @@
+__BETTER IDEA__: the use-case for reshaping data might best be handled by adopting a [Domain Driven Architecture] that allows client-side querying (e.g. Om-Next paired with Datomic).
+
+[Domain Driven Architecture]:http://www.infoq.com/presentations/domain-driven-architecture
+
 # hammock [![Build Status](https://travis-ci.org/shaunlebron/hammock.svg)](https://travis-ci.org/shaunlebron/hammock)
 
 a cljs library that helps you transform one tree into another and to remember related branches.
